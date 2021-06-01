@@ -1,0 +1,51 @@
+// add ocelot
+
+dotnet add package Ocelot --version 17.0.0
+
+// add Iwebhostbuilder in program.cs to start up ocelot gateway
+
+public static IWebHostBuilder CreateHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+            .ConfigureAppConfiguration((Host, config) => config.AddJsonFile("ocelot.json"))
+            .UseStartup<Startup>();
+
+//Add services at startup.cs for ocelot in ConfigureServices
+
+ services.AddOcelot(Configuration);
+
+//Change url in launchSettings.json
+
+"applicationUrl": "https://localhost:5000
+
+// to use ocelot add in void configure
+
+await app.UseOcelot();
+
+//configure routes for gateway in ocelot.json
+"Routes":[
+        {
+            "DownStreamPathTemplate":"/Controller1/{catchAll}",
+            "DownStreamScheme":"https",
+            "DownStreamHostAndPorts":[
+                {
+                    "Host":"localhost",
+                    "Port":"5001"
+                }
+            ],
+            "UpStreamPathTemplate":"/Controller1/{catchAll}"
+        },
+        {
+            "DownStreamPathTemplate":"/Controller2/{catchAll}",
+            "DownStreamScheme":"https",
+            "DownStreamHostAndPorts":[
+                {
+                    "Host":"localhost",
+                    "Port":"5002"
+                }
+            ],
+            "UpStreamPathTemplate":"/Controller2/{catchAll}"
+        }
+    ],
+    "GlobalConfiguration":{
+        "BaseUrl":"https://localhost:5000"
+    }
